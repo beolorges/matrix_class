@@ -4,67 +4,71 @@
 #include <fstream>
 #include <iostream>
 
+using namespace std;
+
+/*-------------------------------PREVIOUSLY DECLARATIONS--------------------------*/
+template <class T>
+class Matrix;
+
+template <typename T>
+istream &operator>>(istream &input, Matrix<T> &_matrix);
+
+template <typename T>
+ostream &operator<<(ostream &output, const Matrix<T> &_matrix);
+
+/*-------------------------------CLASS DECLARATION---------------------------*/
+template <class T>
 class Matrix
 {
 private:
     int rows;
     int columns;
-    double **matrixValues;
+    T **matrixValues;
 
-    void setRows(int _row) { this->rows = _row; };
-    void setColumns(int _column) { this->columns = _column; };
-
-    // FUNÇÕES AUXILIARES
-    int maxColumns(const Matrix &_other) const;
-    int maxRows(const Matrix &_other) const;
-
+    /*--------------------------- FILLING MATRICES FUNCTIONS---------------------------------*/
     Matrix returnMatrix(const int &_numberOfColumns, const int &_numberOfRows, const int &_numberOfTheFunction, const Matrix &_matrixToSum = Matrix()) const;
-    void fillMatrix(const int &_numberOfColumns, const int &_numberOfRows, const int &_numberOfTheFunction, const double &_constToMultiply = 0);
+    Matrix returnMatrix(const int &_numberOfColumns, const int &_numberOfRows, const int &_numberOfTheFunction, const T &_const = 0) const;
+    void fillMatrix(const int &_numberOfColumns, const int &_numberOfRows, const int &_numberOfTheFunction, const T &_constToMultiply = 0);
     void fillMatrix(const int &_numberOfColumns, const int &_numberOfRows, const int &_numberOfTheFunction, const Matrix &_matrixToSum = Matrix());
 
 public:
-    // CONSTRUCTORS AND DESTRUCTOR
-    Matrix() : rows(-1), columns(-1) { matrixValues = (double **)malloc(0 * sizeof(double)); };
-    Matrix(const int &_rows, const int &_columns, const double &_value);
-    Matrix(const Matrix &_other) : rows(_other.getRows()), columns(_other.getColumns()) { matrixValues = (double **)malloc(rows * columns * sizeof(double)); };
-    // Matrix(ifstream &_file);
-    ~Matrix()
-    {
-        free(matrixValues);
-        delete[] matrixValues;
-    };
+    /*----------------------------CONSTRUCTORS AND DESTRUCTOR----------------------------*/
+    Matrix() : rows(0), columns(0){};
+    Matrix(const int _rows, const int _columns, const T &_value = 0);
+    Matrix(const Matrix &_other) : rows(_other.getRows()), columns(_other.getColumns()) { matrixValues = (T **)malloc(rows * columns * sizeof(T)); };
+    Matrix(ifstream &_file);
+    ~Matrix() { delete matrixValues; };
 
-    // GET OPERATIONS
+    /*-----------------------------------GET OPERATIONS---------------------------------*/
     int getRows() const { return this->rows; };
     int getColumns() const { return this->columns; };
-    double getValue(int _row, int _column) const;
+    T getValue(int _row, int _column) const;
 
-    // SET OPERATIONS
-    void setValue(int _row, int _column, double _value);
+    /*-----------------------------------SET OPERATIONS---------------------------------*/
+    void setValue(int _row, int _column, T _value);
 
-    // MATH OPERATORS OVERLOAD
-    Matrix operator+(Matrix const &_other) const { return this->returnMatrix(this->maxColumns(_other), this->maxRows(_other), 1, Matrix()); };
-    Matrix operator-(Matrix const &_other) const { return this->returnMatrix(this->maxColumns(_other), this->maxRows(_other), 2, Matrix()); };
+    /*-------------------------------MATH OVERLOAD OPERATIONS---------------------------*/
+    Matrix operator+(Matrix const &_other) const;
+    Matrix operator-(Matrix const &_other) const;
     Matrix operator*(Matrix const &_other) const;
-    // Matrix operator*(double const &_other) const { return this->returnMatrix(this->getColumns(), this->getRows(), 1, _other); };
-    Matrix operator~() const { return this->returnMatrix(this->getRows(), this->getColumns(), 3, Matrix()); };
     void operator=(Matrix const &_other);
-    void operator+=(Matrix const &_other) { this->returnMatrix(this->maxColumns(_other), this->maxRows(_other), 1, _other); };
-    void operator-=(Matrix const &_other) { this->returnMatrix(this->maxColumns(_other), this->maxRows(_other), 2, _other); };
+    void operator+=(Matrix const &_other);
+    void operator-=(Matrix const &_other);
     void operator*=(Matrix const &_other);
-    void operator*=(double const &_other) { this->fillMatrix(this->getColumns(), this->getRows(), 2, _other); };
-    // double &operator()(int _columns, int _rows) { return &(this->getValue(_rows, _columns)); };
+    T &operator()(int const &_columns, int const &_rows);
+    Matrix operator*(T const &_other) const { return this->returnMatrix(this->getColumns(), this->getRows(), 1, _other); };
+    Matrix operator~() const { return this->returnMatrix(this->getRows(), this->getColumns(), 3, Matrix()); };
+    void operator*=(T const &_other) { this->fillMatrix(this->getColumns(), this->getRows(), 1, _other); };
 
-    // COMPARATORS OVERLOAD
+    /*-------------------------------COMPARATORS OVERLOAD ---------------------------*/
     bool operator==(Matrix const &_other) const;
     bool operator!=(Matrix const &_other) const { return !(*this == _other); };
 
-    // friend functions
-    //  IOSTREAM OPERATORS
-    // friend istream &operator>>(istream &input, Matrix &_matrix);
-    // friend ostream &operator<<(ostream &output, const Matrix &_matrix);
+    /*---------------------------------FRIEND FUNCTIONS-------------------------------*/
+    friend istream &operator>><>(istream &input, Matrix<T> &_matrix);
+    friend ostream &operator<< <>(ostream &output, const Matrix<T> &_matrix);
 };
 
-// #include "matrix.cpp"
+#include "matrix.cpp"
 
 #endif
